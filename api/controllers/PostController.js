@@ -211,7 +211,6 @@ module.exports = {
 		});
 		if(count > 0) {
 			Post.findOne(id, function foundPost(err, post){
-				// Post.find().where({id, "username":username}).exec(function foundPost(err, post){
 					if(err) {
 						var reply = {
 							'status' : 210,
@@ -265,6 +264,7 @@ module.exports = {
 			var id = req.param('id');
 			var username = req.session.User.username;
 			var authorofposts = req.session.User.authorofposts;
+			var user = req.session.User;
 			var count = 0;
 			_.each(authorofposts, function(findId){
 				if(findId === id) {
@@ -280,17 +280,16 @@ module.exports = {
 						};
 						res.status(200).json(reply);
 					} else {
-						var reply = {
-							'status' : 219,
+						var response = {
 							'message' : 'The post has been deleted successfully'
 						};
-						res.status(200).json(reply);
+						updateUserAuthorOfPosts(user, id, response);//function to update authorofposts array
 					}
-				});//to update the user bucket
+				});
 			} else {
 				var reply = {
 					'status' : 217,
-					'message' : 'You are not the author of this post'
+					'message' : 'The post does not exist'
 				};
 				res.status(200).json(reply);
 			}
@@ -301,8 +300,47 @@ module.exports = {
 			};
 			res.status(200).json(reply);
 		}
-	}
 
+		function updateUserAuthorOfPosts(user, id, response) {
+			var authorofposts = user.authorofposts;
+			var username = user.username;
+			var count = 0;
+			var newAuthor = [];
+			_.each(authorofposts, function(findId){
+				if(findId === id) {
+					count++;
+				} else {
+					newAuthor.push(findId);
+				}
+			});
+			if(count>0) {
+				User.update({'username' : username}, {'authorofposts': newAuthor}, function updatedUser(err, user){
+					if(err) {
+						var reply = {
+							'status' : 221,
+							'message' : 'An error occured while deleting the post'
+						};
+						res.status(200).json(reply);
+					} else {
+						var reply = {
+							'status' : 222,
+							'message' : 'The post has been deleted successfully',
+							'post' : response,
+							'user' : user
+						};
+						res.status(200).json(reply);
+					}
+				});
+			} else {
+				var reply = {
+					'status' : 220,
+					'message' : 'The user could not be updated',
+					'post' : response
+				};
+				res.status(200).json(reply);
+			}
+		}
+	}
 	
 };
 
