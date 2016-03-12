@@ -204,8 +204,8 @@ module.exports = {
 		var count = 0;
 		var username = req.session.User.username;
 		var authorofposts = req.session.User.authorofposts;
-		_.each(authorofposts, function(findid){
-			if(findid === id) {
+		_.each(authorofposts, function(findId){
+			if(findId === id) {
 				count++;
 			}
 		});
@@ -246,15 +246,58 @@ module.exports = {
 				});
 			} else {
 				var reply = {
-					'status' : 215,
+					'status' : 214,
 					'message' : 'You are not the author of this post'
 				};
 				res.status(200).json(reply);
 			}
 		} else {
 			var reply = {
-				'status' : 214,
+				'status' : 215,
 				'message' : 'The post cannot be edited. Please login first'
+			};
+			res.status(200).json(reply);
+		}
+	},
+
+	'delete' : function(req, res) {
+		if(req.session.authenticated) {
+			var id = req.param('id');
+			var username = req.session.User.username;
+			var authorofposts = req.session.User.authorofposts;
+			var count = 0;
+			_.each(authorofposts, function(findId){
+				if(findId === id) {
+					count++;
+				}
+			});
+			if(count > 0) {
+				Post.destroy({id : id}).exec(function (err){
+					if(err) {
+						var reply = {
+							'status' : 218,
+							'message' : 'An error occured while deleting the post'
+						};
+						res.status(200).json(reply);
+					} else {
+						var reply = {
+							'status' : 219,
+							'message' : 'The post has been deleted successfully'
+						};
+						res.status(200).json(reply);
+					}
+				});//to update the user bucket
+			} else {
+				var reply = {
+					'status' : 217,
+					'message' : 'You are not the author of this post'
+				};
+				res.status(200).json(reply);
+			}
+		} else {
+			var reply = {
+				'status' : 216,
+				'message' : 'Unable to delete post please login and try again'
 			};
 			res.status(200).json(reply);
 		}

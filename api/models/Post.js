@@ -65,6 +65,9 @@ module.exports = {
   		},
   		download_link : {
   			type : 'string'
+  		},
+  		publishstatus : { // to see whetherthe post is published or in users drafts
+  			type : 'int'
   		}
 
   }
