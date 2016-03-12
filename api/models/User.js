@@ -32,6 +32,9 @@ module.exports = {
   		admin : {
   			type: 'boolean',
 			defaultsTo: false
+  		},
+  		authorofposts : {
+  			type : 'array'
   		}
 
   // 		toJSON: function(){

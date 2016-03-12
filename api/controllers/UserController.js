@@ -113,6 +113,7 @@ module.exports = {
 		var name = req.param('name');
 		var password = req.param('password');
 		var encryptedPassword = "Anurag";
+		var authorofposts = [];
 		require('bcryptjs').hash(password, 10, function passwordEncrypted(err, encryptedPassword){
 			if(err) {
 				var reply = {
@@ -149,7 +150,8 @@ module.exports = {
 				'name' : name,
 				'username' : username,
 				'email' : email,
-				'encryptedPassword' : encryptedPassword
+				'encryptedPassword' : encryptedPassword,
+				'authorofposts' : authorofposts
 			}, function userCreated(err, user){
 				if(err) {
 					var reply = {
@@ -168,7 +170,8 @@ module.exports = {
 						'name' : user.name,
 						'email' : user.email,
 						'token' : token,
-						'username': user.username
+						'username': user.username,
+						'authorofposts' : user.authorofposts
 					};
 					res.status(200).json(reply);
 					return;
