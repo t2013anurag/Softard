@@ -71,10 +71,10 @@ module.exports = {
 						if(!user.mobile || !user.verfied) {
 							var reply = {
 								'status': 105,
-								'message': 'User loggedin but incomplete profile',
+								'message': 'User logged in but incomplete profile',
 								'user' : user,
 								'userid': user.id,
-								'username': user.name,
+								'username': user.username,
 								'email': user.email,
 								'mobile': user.mobile
 							};
@@ -233,7 +233,7 @@ module.exports = {
 						'message': 'Successfully updated the user details',
 						'user' : user,
 						'userid': user.id,
-						'username': user.name,
+						'username': user.username,
 						'email': user.email,
 						'mobile': user.mobile
 					};

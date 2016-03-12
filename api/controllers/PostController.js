@@ -65,6 +65,37 @@ module.exports = {
 			};
 			res.status(200).json(reply);
 		}
+	},
+
+
+	viewall : function(req, res) {
+		var allposts = [];
+		var length = 0;
+		Post.find().populateAll().exec(function foundPost(err, post){
+			if(err) {
+				var reply = {
+					'status' : 203,
+					'message' : 'An error occured while viewing the posts'
+				};
+				res.status(200).json(reply);
+			} else {
+				_.each(post, function(post){
+					allposts.push(post);
+					length++;
+				});
+				viewresponse(allposts,length);
+			}
+		});
+
+		function viewresponse(allposts, length) {
+			var reply = {
+				'status' : 204,
+				'message' : 'All the posts have been fetched',
+				'totalposts' : length,
+				'post' : allposts
+			};
+			res.status(200).json(reply);
+		}
 	}	
 };
 
