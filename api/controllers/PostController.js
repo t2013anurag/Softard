@@ -188,8 +188,10 @@ module.exports = {
 		});
 	},
 
-	'editpostbyauthor' : function(req, res) {
-		var username = req.session.User.username;
+
+	'edit' : function(req, res) {
+
+		if(req.session.authenticated) {
 		var id = req.param('id');
 		var title = req.param('title');
 		var shortdesc = req.param('shortdesc');
@@ -198,24 +200,17 @@ module.exports = {
 		var category = req.param('category');
 		var tags = req.param('tags');
 		var postid = req.session.id;
-		steps = JSON.parse(steps); // steps are passed as json objects in url
-
-		User.findOneByUsername(username, function foundUser(err, user){
-			if(err) {
-				var reply = {
-					'status' : 208,
-					'message' : 'You dont have permission to edit this post'
-				};
-				res.status(200).json(reply);
+		steps = JSON.parse(steps);
+		var count = 0;
+		var username = req.session.User.username;
+		var authorofposts = req.session.User.authorofposts;
+		_.each(authorofposts, function(findid){
+			if(findid === id) {
+				count++;
 			}
-			if(!user) {
-				var reply = {
-					'status' : 209,
-					'message' : 'You are not the owner of this post'
-				};
-				res.status(200).json(reply);
-			} else {
-				 Post.findOne(id, function foundPost(err, post){
+		});
+		if(count > 0) {
+			Post.findOne(id, function foundPost(err, post){
 				// Post.find().where({id, "username":username}).exec(function foundPost(err, post){
 					if(err) {
 						var reply = {
@@ -249,18 +244,21 @@ module.exports = {
 						});
 					}
 				});
+			} else {
+				var reply = {
+					'status' : 215,
+					'message' : 'You are not the author of this post'
+				};
+				res.status(200).json(reply);
 			}
-		});
-	},
-
-
-
-	// deletepostbyauthor : function(req, res) {
-	// 	var username = req.session.User.username;
-	// 	var id = req.param('id');
-		
-
-	// }
+		} else {
+			var reply = {
+				'status' : 214,
+				'message' : 'The post cannot be edited. Please login first'
+			};
+			res.status(200).json(reply);
+		}
+	}
 
 	
 };

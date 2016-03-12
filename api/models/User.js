@@ -35,6 +35,18 @@ module.exports = {
   		},
   		authorofposts : {
   			type : 'array'
+  		},
+  		totalnoofposts : {
+  			type : 'int'
+  		},
+  		totalnoofviews : {
+  			type : 'int'
+  		},
+  		totalnoofstars : {
+  			type : 'int'
+  		},
+  		totalnoofdownstars : {
+  			type : 'int'
   		}
 
   // 		toJSON: function(){
