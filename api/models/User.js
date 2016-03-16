@@ -47,6 +47,12 @@ module.exports = {
   		},
   		totalnoofdownstars : {
   			type : 'int'
+  		},
+  		avatar : {
+  			type : 'string'
+  		},
+  		avatarUrl : {
+  			type : 'string'
   		}
 
   // 		toJSON: function(){

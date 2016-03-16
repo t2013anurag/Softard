@@ -104,9 +104,6 @@ module.exports = {
 	},
 
 
-
-
-
 	'signup' : function(req, res) {
 		var username = req.param('username');
 		var email = req.param('email');
@@ -151,7 +148,9 @@ module.exports = {
 				'username' : username,
 				'email' : email,
 				'encryptedPassword' : encryptedPassword,
-				'authorofposts' : authorofposts
+				'authorofposts' : authorofposts,
+				'avatar' : avatar,
+				'avatarUrl' : avatarUrl
 			}, function userCreated(err, user){
 				if(err) {
 					var reply = {
@@ -171,7 +170,8 @@ module.exports = {
 						'email' : user.email,
 						'token' : token,
 						'username': user.username,
-						'authorofposts' : user.authorofposts
+						'authorofposts' : user.authorofposts,
+						'avatar' : avatar
 					};
 					res.status(200).json(reply);
 					return;
@@ -272,6 +272,58 @@ module.exports = {
 			};
 			res.status(200).json(reply);
 		}
-	}
-};
+	},
 
+
+	'uploadphoto' : function(req, res) {
+		 if(req.session.authenticated){
+			var username = req.session.User.username;
+			var file = req.param('avatar');
+			var avatarimg = '/assets/images/'+username;
+			var avatarUrl =  require('util').format('%s/user/%s', sails.getBaseUrl(),req.session.User.username);
+			res.setTimeout(0);
+		    req.file('avatar')
+		    .upload({
+		      dirname : '../.../../../assets/images/'+username,
+		      saveAs : 'avatar',
+		      // You can apply a file upload limit (in bytes)
+		      maxBytes: 1000000
+		    }, function whenDone(err, uploadedFiles) {
+		      if (err) {
+		      	var reply = {
+		      		'status' : 120,
+		      		'message' : 'error'
+		      	};
+		      	res.status(200).json(reply);
+		      }
+		    else {
+		    	User.update({
+					'username' : username
+					}, {'avatar' : avatarimg, 'avatarUrl' : avatarUrl}, function userUpdated(err, updatedUser){
+						if(err) {
+							var reply = {
+								'status' : 121,
+								'message' : 'An error occured while uploading the photo'
+							};
+							res.status(200).json(reply);
+						} else {
+							var reply = {
+								'status' : 122,
+								'message' : 'Done',
+								'files' : uploadedFiles
+							};
+							res.status(200).json(reply);
+						}
+					});
+		    	}
+		    });
+		} else {
+			var reply = {
+				'status' : 123,
+				'message' : 'oops login'
+			};
+			res.status(200).json(reply);
+		}
+	},
+}			
+		

@@ -35,6 +35,7 @@ module.exports.routes = {
   '/': {
     view: 'partial/index'
   },
+  '/file/upload' : 'UserController.uploadphoto'
 
 
   /***************************************************************************
