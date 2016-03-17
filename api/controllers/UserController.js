@@ -142,7 +142,8 @@ module.exports = {
 		});
 
 		function create_user_account(encryptedPassword) {
-			console.log(name + username + email + encryptedPassword);
+			var avatar = "";
+			var avatarUrl = "";
 			User.create({
 				'name' : name,
 				'username' : username,
@@ -171,7 +172,8 @@ module.exports = {
 						'token' : token,
 						'username': user.username,
 						'authorofposts' : user.authorofposts,
-						'avatar' : avatar
+						'avatar' : avatar,
+						'user' : user
 					};
 					res.status(200).json(reply);
 					return;
@@ -325,5 +327,6 @@ module.exports = {
 			res.status(200).json(reply);
 		}
 	},
+
 }			
 		
