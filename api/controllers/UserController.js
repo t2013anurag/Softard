@@ -341,6 +341,10 @@ module.exports = {
 			var mobile = req.param('mobile');
 			var about = req.param('about');
 			var username = req.param('username');
+			var profession = req.param('profession');
+			about = about.replace(/-/g,' ');
+			profession = profession.replace(/-/g,' ');
+			name = name.replace(/-/g,' ');
 					User.findOneByUsername(username, function foundUser(err, user){
 					if(err) {
 						var reply = {
@@ -368,7 +372,8 @@ module.exports = {
 				'email' : email,
 				'mobile' : mobile,
 				'website' : website,
-				'about' : about
+				'about' : about,
+				'profession' : profession
 			}, function userUpdated(err, user){
 				if(err) {
 					var reply = {
