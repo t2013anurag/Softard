@@ -142,8 +142,9 @@ module.exports = {
 		});
 
 		function create_user_account(encryptedPassword) {
-			var avatar = "";
-			var avatarUrl = "";
+			var avatar = null;
+			var avatarUrl = null;
+			var profession = null, website = null, mobile = null, verfied = null,about = null;
 			User.create({
 				'name' : name,
 				'username' : username,
@@ -151,7 +152,12 @@ module.exports = {
 				'encryptedPassword' : encryptedPassword,
 				'authorofposts' : authorofposts,
 				'avatar' : avatar,
-				'avatarUrl' : avatarUrl
+				'avatarUrl' : avatarUrl,
+				'profession' : profession,
+				'website' : website,
+				'mobile' : mobile,
+				'verfied' : verfied,
+				'about' : about
 			}, function userCreated(err, user){
 				if(err) {
 					var reply = {
@@ -325,6 +331,64 @@ module.exports = {
 				'message' : 'oops login'
 			};
 			res.status(200).json(reply);
+		}
+	},
+
+	'updateprofile' : function(req, res) {
+			var email = req.param('email');
+			var name = req.param('name');
+			var website = req.param('website');
+			var mobile = req.param('mobile');
+			var about = req.param('about');
+			var username = req.param('username');
+					User.findOneByUsername(username, function foundUser(err, user){
+					if(err) {
+						var reply = {
+							'status' : 124,
+							'message': 'An error occured while finding the user'
+						};
+						res.status(200).json(reply);
+					} 
+					if(!user) {
+						var reply = {
+							'status' : 125,
+							'message' : 'The details Could not be updated'
+						};
+						res.status(200).json(reply);
+					} else {
+						update_user_details();
+					}
+				});
+		
+		function update_user_details() {
+			User.update({
+				'username' : username
+			}, {
+				'name' : name,
+				'email' : email,
+				'mobile' : mobile,
+				'website' : website,
+				'about' : about
+			}, function userUpdated(err, user){
+				if(err) {
+					var reply = {
+						'status' : 127,
+						'message' : 'An error occured while updating the user account details'
+					};
+					res.status(200).json(reply);
+				} else {
+					var reply = {
+						'status': 130,
+						'message': 'Successfully updated the user details',
+						'user' : user,
+						'userid': user.id,
+						'username': user.username,
+						'email': user.email,
+						'mobile': user.mobile
+					};
+					res.status(200).json(reply);
+				}
+			});
 		}
 	},
 

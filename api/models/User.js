@@ -53,6 +53,15 @@ module.exports = {
   		},
   		avatarUrl : {
   			type : 'string'
+  		},
+  		profession : {
+  			type : 'string'
+  		},
+  		website : {
+  			type : 'string'
+  		},
+  		about : {
+  			type : 'string'
   		}
 
   // 		toJSON: function(){
