@@ -14,7 +14,6 @@ module.exports = {
 			var steps  = req.param('allsteps');
 			var platform = req.param('platform');
 			var tags = req.param('tags');
-			var postid = req.param('id');
 			var username = req.param('username');
 			var author = req.param('name');
 			//steps = JSON.parse(steps); // steps are passed as json objects in url
@@ -32,8 +31,7 @@ module.exports = {
 					'shortdesc': shortdesc,
 					'steps' : steps,
 					'platform' : platform,
-					'tags' : tags,
-					'postid' : postid
+					'tags' : tags
 				}, function postCreated(err, post){
 					if(err) {
 						var reply = {
@@ -96,7 +94,7 @@ module.exports = {
 			 			}
 			 		});
 			 	}
-			 })
+			 });
 		}
 	},
 
@@ -133,7 +131,7 @@ module.exports = {
 
 	viewpostbyauthor : function(req, res) {
 		var username = req.param('username');
-		Post.findOneByUsername(username, function foundPost(err, post){
+		Post.find().where({'username' : username}).exec(function foundUser(err, post){
 			if(err) {
 				var reply = {
 					'status' : 205,
@@ -187,73 +185,82 @@ module.exports = {
 
 
 	'edit' : function(req, res) {
-
-		if(req.session.authenticated) {
-			var id = req.param('id');
-			var title = req.param('title');
-			var shortdesc = req.param('shortdesc');
-			var longdesc = req.param('longdesc');
-			var steps  = req.param('steps');
-			var category = req.param('category');
-			var tags = req.param('tags');
-			var postid = req.session.id;
-			steps = JSON.parse(steps);
-			var count = 0;
-			var username = req.session.User.username;
-			var authorofposts = req.session.User.authorofposts;
-			_.each(authorofposts, function(findId){
-				if(findId === id) {
-					count++;
-				}
-			});
-			if(count > 0) {
+		var count = 0 ;
+		var title = req.param('title');
+		var shortdesc = req.param('shortdesc');
+		// var longdesc = req.param('longdesc');
+		var steps  = req.param('allsteps');
+		var platform = req.param('platform');
+		var tags = req.param('tags');
+		var postid = req.param('id');
+		var username = req.param('username');
+		var author = req.param('name');
+		var id = postid;
+		User.findOneByUsername(username, function foundUser(err, user){
+		 	if(err) {
+		 		var reply = {
+		 			'status' : 300,
+		 			'message' : 'The user not found'
+		 		};
+		 		res.status(200).json(reply);
+		 	} 
+		 	if(!user) {
+		 		var reply = {
+		 			'status' : 301,
+		 			'message' : 'User not found'
+		 		};
+		 		res.status(200).json(reply);
+		 	} else {
+		 		var authorofposts = user.authorofposts;
+		 		_.each(authorofposts, function(findId){
+					if(findId === postid) {
+				 		count++;
+				 	}
+		 		});
+		 				 	if(count > 0) {
 				Post.findOne(id, function foundPost(err, post){
-						if(err) {
-							var reply = {
-								'status' : 210,
-								'message' : 'An error occured while finding the post to edit'
-							};
-							res.status(200).json(reply);
-						}
-						if(!post) {
-							var reply = {
-								'status' : 211,
-								'message' : 'No such post exist with this id'
-							};
-							res.status(200).json(reply);
-						} else {
-							Post.update(id, {'title' : title, 'shortdesc' : shortdesc, 'longdesc' : longdesc, 'steps' : steps, 'category' : category,'tags' : tags}, function postEdited(err, post){
-								if(err) {
-									var reply = {
-										'status' : 212,
-										'message' : 'Oops, an error occured while editing the post'
-									};
-									res.status(200).json(reply);
-								} else {
-									var reply = {
-										'status' : 213,
-										'message' : 'The post has been updated successfully'
-									};
-									res.status(200).json(reply);
-									return;
-								}									
-							});
-						}
-					});
-				} else {
-					var reply = {
-						'status' : 214,
-						'message' : 'You are not the author of this post'
-					};
-					res.status(200).json(reply);
-				}
-		} else {
-			var reply = {
-				'status' : 215,
-				'message' : 'The post cannot be edited. Please login first'
-			};
-			res.status(200).json(reply);
-		}
+					if(err) {
+						var reply = {
+							'status' : 210,
+							'message' : 'An error occured while finding the post to edit'
+						};
+						res.status(200).json(reply);
+					}
+					if(!post) {
+						var reply = {
+							'status' : 211,
+							'message' : 'No such post exist with this id'
+						};
+						res.status(200).json(reply);
+					} else {
+						Post.update(id, {'title' : title, 'shortdesc' : shortdesc, 'steps' : steps, 'platform' : platform,'tags' : tags}, function postEdited(err, post){
+							if(err) {
+								var reply = {
+									'status' : 212,
+									'message' : 'Oops, an error occured while editing the post'
+								};
+								res.status(200).json(reply);
+							} else {
+								var reply = {
+									'status' : 213,
+									'message' : 'The post has been updated successfully',
+									'post' : post
+								};
+								res.status(200).json(reply);
+								return;
+							}									
+						});
+					}
+				});
+			} else {
+				var reply = {
+					'status' : 214,
+					'message' : 'You are not the author of this post'
+				};
+				res.status(200).json(reply);
+		 		}
+		 	}		 	
+		});
 	},
 
 	'delete' : function(req, res) {
