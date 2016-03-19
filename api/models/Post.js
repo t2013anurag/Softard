@@ -22,8 +22,11 @@ module.exports = {
   			type : 'int'
   		},
   		steps : {
-  			type : 'object'
+  			type : 'array'
   		},
+      platform : {
+        type : 'string'
+      },
   		images : {
   			type : 'string'
   		},

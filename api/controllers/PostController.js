@@ -7,18 +7,17 @@
 
 module.exports = {
 	'createpost' : function(req, res) {		
-		if(req.session.authenticated) {
-			var author = req.session.User.name;
-			var username = req.session.User.username;
+		// if(req.session.authenticated) {
 			var title = req.param('title');
 			var shortdesc = req.param('shortdesc');
-			var longdesc = req.param('longdesc');
-			var steps  = req.param('steps');
-			var category = req.param('category');
+			// var longdesc = req.param('longdesc');
+			var steps  = req.param('allsteps');
+			var platform = req.param('platform');
 			var tags = req.param('tags');
-			var postid = req.session.id;
-			var user = req.session.User;
-			steps = JSON.parse(steps); // steps are passed as json objects in url
+			var postid = req.param('id');
+			var username = req.param('username');
+			var author = req.param('name');
+			//steps = JSON.parse(steps); // steps are passed as json objects in url
 			if(!title) {
 				var reply = {
 					'status' : 201,
@@ -31,9 +30,8 @@ module.exports = {
 					'author' : author,
 					'title'	: title,
 					'shortdesc': shortdesc,
-					'longdesc' : longdesc,
 					'steps' : steps,
-					'category' : category,
+					'platform' : platform,
 					'tags' : tags,
 					'postid' : postid
 				}, function postCreated(err, post){
@@ -51,26 +49,25 @@ module.exports = {
 							'author' : author,
 							'title'	: title,
 							'shortdesc': shortdesc,
-							'longdesc' : longdesc,
 							'steps' : steps,
-							'category' : category,
+							'platform' : platform,
 							'tags' : tags,
 							'id' : post.id
 						};
-						addPostToUserBucket(id, user, response); // A function to add the postid to the user author array
+						addPostToUserBucket(id, username, response); // A function to add the postid to the user author array
 					}
 				});
 			}
-		} else {
-			var reply = {
-				'status' : 200,
-				'message' : 'The user session is invalid'
-			};
-			res.status(200).json(reply);
-		}
+		// } else {
+		// 	var reply = {
+		// 		'status' : 200,
+		// 		'message' : 'The user session is invalid'
+		// 	};
+		// 	res.status(200).json(reply);
+		// }
 
-		function addPostToUserBucket(id, user, response) { // here id = id of post created, user = user information, response = previous response
-			var username = user.username;
+		function addPostToUserBucket(id, username, response) { // here id = id of post created, user = user information, response = previous response
+			
 			 User.findOneByUsername(username, function foundUser(err, user){
 			 	if(err) {
 			 		var reply = {
