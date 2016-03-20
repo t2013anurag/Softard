@@ -9,14 +9,33 @@ module.exports = {
 	'createpost' : function(req, res) {		
 		// if(req.session.authenticated) {
 			var title = req.param('title');
+			title = title.replace(/-/g, " ");
 			var shortdesc = req.param('shortdesc');
-			// var longdesc = req.param('longdesc');
-			var steps  = req.param('allsteps');
+			shortdesc = shortdesc.replace(/-/g, " ");
+
+			/* Converting steps to array */
+			var allsteps  = req.param('allsteps');
+			allsteps = allsteps.replace(/-/g," ");
+			var steps = [];
+			steps = allsteps.split('azxsqwedc,');
+				/* Fixed the last step which by default appended the split string */
+			var length = steps.length;
+			steps[length-1] = steps[length-1].replace('azxsqwedc',"");
+
+
+
 			var platform = req.param('platform');
-			var tags = req.param('tags');
+			var tag = req.param('tags');
+			
+			/* Converting tags to array */
+			var tags = [];
+			tags = tag.split(",");
+
+
 			var username = req.param('username');
 			var author = req.param('name');
-			//steps = JSON.parse(steps); // steps are passed as json objects in url
+			author = author.replace(/-/g," ");
+
 			if(!title) {
 				var reply = {
 					'status' : 201,
