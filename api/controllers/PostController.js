@@ -13,7 +13,11 @@ module.exports = {
 			var shortdesc = req.param('shortdesc');
 			shortdesc = shortdesc.replace(/-/g, " ");
 			var allsteps = req.param('allsteps');
+
 			allsteps = allsteps.replace(/@@/g,' ');
+			allsteps = allsteps.replace(/zaxs/g,'#');
+			allsteps = allsteps.replace(/4sp/g,'    ');
+			console.log(allsteps);
 			var platform = req.param('platform');
 			var tag = req.param('tags');
 			var tags = [];
@@ -191,16 +195,32 @@ module.exports = {
 
 	'edit' : function(req, res) {
 		var count = 0 ;
-		var title = req.param('title');
-		var shortdesc = req.param('shortdesc');
+
 		// var longdesc = req.param('longdesc');
-		var steps  = req.param('allsteps');
-		var platform = req.param('platform');
-		var tags = req.param('tags');
-		var postid = req.param('id');
-		var username = req.param('username');
-		var author = req.param('name');
-		var id = postid;
+
+
+			var postid = req.param('id');
+			var id = postid;
+
+
+			var title = req.param('title');
+			title = title.replace(/-/g, " ");
+			var shortdesc = req.param('shortdesc');
+			shortdesc = shortdesc.replace(/-/g, " ");
+			var allsteps = req.param('allsteps');
+
+			allsteps = allsteps.replace(/@@/g,' ');
+			allsteps = allsteps.replace(/zaxs/g,'#');
+			allsteps = allsteps.replace(/4sp/g,'    ');
+
+			var platform = req.param('platform');
+			var tag = req.param('tags');
+			var tags = [];
+			tags = tag.split(",");
+			var username = req.param('username');
+			var author = req.param('name');
+			author = author.replace(/-/g," ");
+
 		User.findOneByUsername(username, function foundUser(err, user){
 		 	if(err) {
 		 		var reply = {
@@ -222,7 +242,7 @@ module.exports = {
 				 		count++;
 				 	}
 		 		});
-		 				 	if(count > 0) {
+		 		if(count > 0) {
 				Post.findOne(id, function foundPost(err, post){
 					if(err) {
 						var reply = {
@@ -238,7 +258,7 @@ module.exports = {
 						};
 						res.status(200).json(reply);
 					} else {
-						Post.update(id, {'title' : title, 'shortdesc' : shortdesc, 'steps' : steps, 'platform' : platform,'tags' : tags}, function postEdited(err, post){
+						Post.update(id, {'title' : title, 'shortdesc' : shortdesc, 'steps' : allsteps, 'platform' : platform,'tags' : tags}, function postEdited(err, post){
 							if(err) {
 								var reply = {
 									'status' : 212,
