@@ -269,48 +269,60 @@ module.exports = {
 	},
 
 	'delete' : function(req, res) {
-		if(req.session.authenticated) {
 			var id = req.param('id');
 			var username = req.param('username');
-			var user = req.param('user');
-			console.log(user);
-			var authorofposts = req.session.User.authorofposts;
-			var user = req.session.User;
-			var count = 0;
-			_.each(authorofposts, function(findId){
-				if(findId === id) {
-					count++;
-				}
-			});
-			if(count > 0) {
-				Post.destroy({id : id}).exec(function (err){
-					if(err) {
-						var reply = {
-							'status' : 218,
-							'message' : 'An error occured while deleting the post'
-						};
-						res.status(200).json(reply);
-					} else {
-						var response = {
-							'message' : 'The post has been deleted successfully'
-						};
-						updateUserAuthorOfPosts(user, id, response);//function to update authorofposts array
+			var authorofposts = [];
+			User.findOneByUsername(username, function foundUser(err, user){
+			 	if(err) {
+			 		var reply = {
+			 			'status' : 215,
+			 			'message' : 'An error occured while creating the post and adding to user bucket'
+			 		};
+			 		res.status(200).json(reply);
+			 	} 
+			 	if(!user) {
+			 		var reply = {
+			 			'status' : 216,
+			 			'message' : 'User nor found'
+			 		};
+			 		res.status(200).json(reply);
+			 	}
+			 	else {
+			 			authorofposts = user.authorofposts;
+			 			findPostInUserBucket(authorofposts, user, id);
+			 	}
+			 });
+
+			function findPostInUserBucket(authorofposts, user, id) {
+				var count = 0;
+				_.each(authorofposts, function(findId){
+					if(findId === id) {
+						count++;
 					}
 				});
-			} else {
-				var reply = {
-					'status' : 217,
-					'message' : 'The post does not exist'
-				};
-				res.status(200).json(reply);
+				if(count > 0) {
+					Post.destroy({id : id}).exec(function (err){
+						if(err) {
+							var reply = {
+								'status' : 218,
+								'message' : 'An error occured while deleting the post'
+							};
+							res.status(200).json(reply);
+						} else {
+							var response = {
+								'message' : 'The post has been deleted successfully'
+							};
+							updateUserAuthorOfPosts(user, id, response);//function to update authorofposts array
+						}
+					});
+				} else {
+					var reply = {
+						'status' : 217,
+						'message' : 'The post does not exist'
+					};
+					res.status(200).json(reply);
+				}
 			}
-		} else {
-			var reply = {
-				'status' : 216,
-				'message' : 'Unable to delete post please login and try again'
-			};
-			res.status(200).json(reply);
-		}
 
 		function updateUserAuthorOfPosts(user, id, response) {
 			var authorofposts = user.authorofposts;
