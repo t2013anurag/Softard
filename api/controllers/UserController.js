@@ -190,67 +190,89 @@ module.exports = {
 
 	'update' : function(req, res) {
 		var username = req.param('username');
-		var email = req.param('email');
-		var name = req.param('name');
 		var password = req.param('password');
+		var newpassword = req.param('newpassword');
 		var encryptedPassword = "Anurag";
-		require('bcryptjs').hash(password, 10, function passwordEncrypted(err, encryptedPassword){
+
+		User.findOneByUsername(username, function(err, user){
 			if(err) {
 				var reply = {
-					'status' : 112,
-					'message' : 'Could not hash the password'
+					'status' : 1100,
+					'message' : 'An error oxxured while finding the user'
 				};
 				res.status(200).json(reply);
-				return next(err);
-			} else { 
-				encryptedPassword = encryptedPassword;
-				User.findOneByUsername(username, function foundUser(err, user){
-				if(err) {
-					var reply = {
-						'status' : 113,
-						'message': 'An error occured while finding the user'
-					};
-					res.status(200).json(reply);
-				} 
-				if(!user) {
-					var reply = {
-						'status' : 114,
-						'message' : 'The details Could not be updated'
-					};
-					res.status(200).json(reply);
-				} else {
-					update_user_details();
-				}
-			});
-		}
+			}
+			if(!user) {
+				var reply = {
+					'status' : 1101,
+					'message' : 'The user could not be found'
+				};
+				res.status(200).json(reply);
+			} else {
+				var userCurrentPassword = user.encryptedPassword;
+				checkUserValidity(password, userCurrentPassword);
+			}
 		});
 
-		function update_user_details() {
-			User.update({
-				'username' : username
-			}, {
-				'name' : name,
-				'encryptedPassword' : encryptedPassword,
-			}, function userUpdated(err, user){
+
+		function checkUserValidity(password, userCurrentPassword) {
+			bcrypt.compare(password, userCurrentPassword, function(err, valid){
 				if(err) {
 					var reply = {
-						'status' : 115,
-						'message' : 'An error occured while updating the user account details'
-					};
-					res.status(200).json(reply);
-				} else {
-					var reply = {
-						'status': 116,
-						'message': 'Successfully updated the user details',
-						'user' : user,
-						'userid': user.id,
-						'username': user.username,
-						'email': user.email,
-						'mobile': user.mobile
+						'status': 1103,
+						'message': 'An error occured while comparing passwords'
 					};
 					res.status(200).json(reply);
 				}
+				if(!valid) {
+					var reply = {
+						'status' : 1104,
+						'message': 'The password is invalid'
+					};
+					res.status(200).json(reply);
+				} else {
+					updateUserPassword(newpassword);
+				}
+			});	
+		}
+
+		function updateUserPassword(newpassword) {
+			require('bcryptjs').hash(newpassword, 10, function passwordEncrypted(err, newEncrypted){
+				if(err) {
+					var reply = {
+						'status' : 1105,
+						'message' : 'The password could not be hashed'
+					};
+					res.status(200).json(reply);
+					return next(err);
+				} else { 
+					User.update({
+						'username' : username
+					}, {
+						'encryptedPassword' : newEncrypted,
+					}, function userUpdated(err, user){
+						if(err) {
+							var reply = {
+								'status' : 1106,
+								'message' : 'An error occured while updating the user account details'
+							};
+							res.status(200).json(reply);
+						} else {
+							var reply = {
+								'status': 1107,
+								'message': 'Successfully updated the user details',
+								'user' : user,
+								'userid': user.id,
+								'username': user.username,
+								'email': user.email,
+								'mobile': user.mobile
+							};
+							res.status(200).json(reply);
+						}
+					});	
+				}
 			});
+
 		}
 	},
 
