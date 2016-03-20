@@ -12,26 +12,12 @@ module.exports = {
 			title = title.replace(/-/g, " ");
 			var shortdesc = req.param('shortdesc');
 			shortdesc = shortdesc.replace(/-/g, " ");
-
-			/* Converting steps to array */
-			var allsteps  = req.param('allsteps');
-			allsteps = allsteps.replace(/-/g," ");
-			var steps = [];
-			steps = allsteps.split('azxsqwedc,');
-				/* Fixed the last step which by default appended the split string */
-			var length = steps.length;
-			steps[length-1] = steps[length-1].replace('azxsqwedc',"");
-
-
-
+			var allsteps = req.param('allsteps');
+			allsteps = allsteps.replace(/@@/g,' ');
 			var platform = req.param('platform');
 			var tag = req.param('tags');
-			
-			/* Converting tags to array */
 			var tags = [];
 			tags = tag.split(",");
-
-
 			var username = req.param('username');
 			var author = req.param('name');
 			author = author.replace(/-/g," ");
@@ -48,7 +34,7 @@ module.exports = {
 					'author' : author,
 					'title'	: title,
 					'shortdesc': shortdesc,
-					'steps' : steps,
+					'steps' : allsteps,
 					'platform' : platform,
 					'tags' : tags
 				}, function postCreated(err, post){
@@ -66,7 +52,7 @@ module.exports = {
 							'author' : author,
 							'title'	: title,
 							'shortdesc': shortdesc,
-							'steps' : steps,
+							'steps' : allsteps,
 							'platform' : platform,
 							'tags' : tags,
 							'id' : post.id
@@ -285,7 +271,9 @@ module.exports = {
 	'delete' : function(req, res) {
 		if(req.session.authenticated) {
 			var id = req.param('id');
-			var username = req.session.User.username;
+			var username = req.param('username');
+			var user = req.param('user');
+			console.log(user);
 			var authorofposts = req.session.User.authorofposts;
 			var user = req.session.User;
 			var count = 0;
