@@ -277,31 +277,22 @@ module.exports = {
 	},
 
 	'deleteuser' : function(req, res) {
-		if(req.session.authenticated) {
-			var username = req.session.User.username;
-			console.log(username);
-			User.destroy({username:username}).exec(function (err){
-				if(err) {
-					var reply = {
-						'status' : 117,
-						'message' : 'An error occured while deleting the user'
-					};
-					res.status(200).json(reply);
-				} else {
-					var reply = {
-						'status' : 118,
-						'message' : 'User Successfully deleted'
-					};
-					res.status(200).json(reply);
-				}
-			});
-		} else {
-			var reply = {
-				'status' : 119,
-				'message' : 'Unable to delete the user account'
-			};
-			res.status(200).json(reply);
-		}
+		var username = req.param('username');
+		User.destroy({username:username}).exec(function (err){
+			if(err) {
+				var reply = {
+					'status' : 117,
+					'message' : 'An error occured while deleting the user'
+				};
+				res.status(200).json(reply);
+			} else {
+				var reply = {
+					'status' : 118,
+					'message' : 'User Successfully deleted'
+				};
+				res.status(200).json(reply);
+			}
+		});
 	},
 
 
