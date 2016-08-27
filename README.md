@@ -43,5 +43,4 @@ The server by default runs on post 1337.
 Go to http://localhost:1337
 You will see the homepage. Note : you need to create your posts and perform all operations.
 You have successfully installed the server and client.
-The live preview is available here : softard.cloudapp.net:5000
 
